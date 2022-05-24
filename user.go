@@ -8,7 +8,8 @@ import (
 type User struct {
 	Name   string
 	Addr   string
-	C      chan string
+	C      chan string //用户发送消息的通道
+	isLive chan bool   //用户活跃通道
 	conn   net.Conn
 	server *Server //该用户所对应的server
 }
@@ -20,6 +21,7 @@ func NewUser(conn net.Conn, server *Server) *User {
 		Name:   userAddr,
 		Addr:   userAddr,
 		C:      make(chan string),
+		isLive: make(chan bool),
 		conn:   conn,
 		server: server,
 	}
@@ -87,7 +89,6 @@ func (this *User) DoMessage(msg string) {
 		}
 	} else {
 		this.server.BroadCast(this, msg)
-
 	}
 }
 

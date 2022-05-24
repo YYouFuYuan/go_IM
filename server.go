@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 	"sync"
+	"time"
 )
 
 type Server struct {
@@ -74,11 +75,31 @@ func (this *Server) Handler(conn net.Conn) {
 			msg := string(buf[:n-1])
 			//将得到的消息进行处理
 			user.DoMessage(msg)
-
+			//更新活跃通道
+			user.isLive <- true
 		}
 	}()
 	//先阻塞
-	select {}
+	for {
+		select {
+		case <-user.isLive:
+			//当前用户是活跃的，应该重置定时器
+		case <-time.After(time.Second * 10):
+			//已经超时
+			//当前用户强制下线
+			user.SendMessage("force offline")
+			//删除用户
+			delete(this.OnlineMap, user.Name)
+			//关闭用户监听的通道
+			close(user.C)
+			close(user.isLive)
+			//关闭链接
+			conn.Close()
+
+			return //关闭该协程
+		}
+	}
+
 }
 
 //启动服务器的接口
