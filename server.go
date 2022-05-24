@@ -47,7 +47,6 @@ func (this *Server) LinstenMessage() {
 //服务器广播消息
 func (this *Server) BroadCast(user *User, msg string) {
 	sendMsg := "[" + user.Addr + "]" + user.Name + ":" + msg
-
 	this.Message <- sendMsg
 }
 
