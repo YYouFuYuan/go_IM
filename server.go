@@ -84,10 +84,10 @@ func (this *Server) Handler(conn net.Conn) {
 		select {
 		case <-user.isLive:
 			//当前用户是活跃的，应该重置定时器
-		case <-time.After(time.Second * 10):
+		case <-time.After(time.Second * 300):
 			//已经超时
 			//当前用户强制下线
-			user.SendMessage("force offline")
+			user.SendMessage("force offline\n")
 			//删除用户
 			delete(this.OnlineMap, user.Name)
 			//关闭用户监听的通道
